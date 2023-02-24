@@ -1,0 +1,54 @@
+-- In this SQL code, I analyze AirBnB listings and reviews datasets from Vancouver, B.C. to understand potential revenue gained from investing in an airbnb and the best location in Vancouver.
+
+
+
+ -- #1 How much did the top AirBnB earner make in 2022?
+
+/** In a month **/
+  
+  Select top (20) 
+  id, listing_url, name, property_type, neighbourhood_cleansed, room_type, accommodates, price, (30- availability_30) As Booked_30, price* (30-availability_30) AS Revenue_30
+  FROM AirBnb.dbo.listings_new
+  ORDER By Revenue_30 DESC
+
+/** In a year **/
+
+  Select top (20) 
+  id, listing_url, name, property_type, neighbourhood_cleansed, room_type, accommodates, price, (365- availability_365) As Booked_365, price* (365-availability_365) AS Revenue_Per_Year
+  FROM AirBnb.dbo.listings_new
+  ORDER By Revenue_Per_Year DESC
+
+
+
+-- #2 What are the property_type with listing price above average listing price per night?
+
+ 
+SELECT  property_type, COUNT (property_type) AS num_above_avg_price
+FROM AirBnb.dbo.listings_new
+WHERE price >
+ (SELECT AVG(price) FROM AirBnb.dbo.listings_new )
+ GROUP BY  property_type
+ORDER BY count(property_type) DESC
+
+
+
+-- #3 What are the top 10 neighbourhood locations
+
+SELECT TOP (10)
+neighbourhood_cleansed, COUNT( neighbourhood_cleansed) As Popular_neighbourhood
+FROM AirBnb.dbo.listings_new
+GROUP BY neighbourhood_cleansed
+ORDER BY Popular_neighbourhood DESC
+
+
+
+-- #4 Which neighbourhood has reviews with good comments on location
+
+SELECT 
+listings_new.neighbourhood_cleansed, COUNT(listings_new.neighbourhood_cleansed) AS num_good_location_reviews
+FROM dbo.reviews
+INNER JOIN dbo.listings_new 
+ON dbo.reviews.listing_id = dbo.listings_new.id
+WHERE comments LIKE '% great location%' or comments like '%perfect Location%' or comments like '% ideal location%' or comments like '% convinient location%'
+Group by listings_new.neighbourhood_cleansed
+order by COUNT(listings_new.neighbourhood_cleansed) DESC
