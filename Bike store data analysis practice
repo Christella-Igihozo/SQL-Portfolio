@@ -1,0 +1,48 @@
+--- Wrote a query that return only the data I need to analyze and visualize sales trends of Bike stores for the year 2016, 2017 and 2018.
+----Further analysis and visualization was done using Tableau Public.
+
+
+SELECT A. order_id,
+    A.order_date,
+    YEAR( A.order_date) as year,
+    CONCAT( B.first_name, ' ', B.last_name) AS customer_name, 
+    B.city,
+    B.state,
+    C.quantity,
+    C.list_price,
+    SUM(C. quantity) AS Units_sold,
+    SUM (C. quantity* C. list_price) AS total_revenue,
+    D.product_name,
+    E.category_name,
+    F.brand_name,
+    G.store_name,
+    CONCAT(H.first_name,' ',H.last_name) AS staff_name
+FROM sales.orders A
+JOIN sales.customers B
+on A.customer_id=B.customer_id
+JOIN sales.order_items C
+ON A.order_id= C.order_id
+JOIN production.products D
+ON D.product_id= C.product_id
+JOIN production.categories E
+ON E. category_id= D. category_id
+JOIN production.brands F
+ON F.brand_id= D.brand_id
+JOIN sales.stores G
+ON G.store_id=A.store_id
+JOIN sales.staffs H
+ON H.staff_id= A.staff_id
+GROUP BY
+    A. order_id,
+    A.order_date,
+    CONCAT( B.first_name, ' ', B.last_name), 
+    B.city,
+    B.state,
+    C.quantity,
+    C.list_price,
+    D.product_name,
+    E.category_name,
+    F.brand_name,
+    G.store_name,
+    CONCAT(H.first_name,' ',H.last_name),
+     YEAR( A.order_date)
